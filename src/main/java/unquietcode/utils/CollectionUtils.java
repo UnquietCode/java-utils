@@ -1,7 +1,6 @@
 package unquietcode.utils;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 
 public final class CollectionUtils {
 	private CollectionUtils() { }
@@ -44,5 +43,15 @@ public final class CollectionUtils {
 
 		sb.append(suffix);
 		return sb.toString();
+	}
+
+	public static <T> Set<T> randomSubset(Set<T> set, int count, Set<T> target) {
+		List<T> list = new LinkedList<>(set);
+		Collections.shuffle(list);
+
+		int end = count <= list.size() ? count : list.size();
+		target.addAll(list.subList(0, end));
+
+		return target;
 	}
 }
