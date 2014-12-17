@@ -7,11 +7,7 @@ import java.util.function.Consumer;
  */
 public class StringUtils {
 
-	public static String reverse(String string) {
-		StringBuilder sb = new StringBuilder(string);
-		sb = sb.reverse();
-		return sb.toString();
-	}
+	// starts with
 
 	public static boolean startsWithAny(String string, String...prefixes) {
 		for (String prefix : prefixes)
@@ -31,6 +27,9 @@ public class StringUtils {
 		return false;
 	}
 
+
+	// ends with
+
 	public static boolean endsWithAny(String string, String...suffixes) {
 		for (String suffix : suffixes)
 			if (string.endsWith(suffix))
@@ -49,22 +48,70 @@ public class StringUtils {
 		return false;
 	}
 
+
+	// equals
+
 	public static boolean equalsAny(String string, String...others) {
 		return Conditionals.equalsAny(string, others);
 	}
 
 	public static boolean equalsAnyCI(String string, String...others) {
-		string = string.toLowerCase();
-
 		for (String other : others)
-			if (string.equals(other.toLowerCase()))
+			if (string.equalsIgnoreCase(other))
 				return true;
 
 		return false;
 	}
 
+
+	// empty
+
+	public static boolean isEmpty(String string) {
+		return string == null  ||  string.trim().isEmpty();
+	}
+
+	public static boolean isNotEmpty(String string) {
+		return !isEmpty(string);
+	}
+
 	public static boolean hasText(String string) {
-		return string != null  &&  !string.trim().isEmpty();
+		return !isEmpty(string);
+	}
+
+
+	public static boolean areEmpty(String...args) {
+		for (String str : CollectionUtils.safe(args)) {
+			if (isNotEmpty(str)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static boolean areNotEmpty(String...args) {
+		return !areEmpty(args);
+	}
+
+	public static boolean anyAreEmpty(String...strings) {
+		for (String string : strings) {
+			if (isEmpty(string)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean noneAreEmpty(String...strings) {
+		return !anyAreEmpty(strings);
+	}
+
+
+	// misc.
+
+	public static String reverse(String string) {
+		StringBuilder sb = new StringBuilder(string);
+		sb = sb.reverse();
+		return sb.toString();
 	}
 
 	public static void match(String text, String prefix, String suffix, Consumer<String> consumer) {

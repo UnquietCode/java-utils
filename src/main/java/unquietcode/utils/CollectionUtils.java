@@ -54,4 +54,19 @@ public final class CollectionUtils {
 
 		return target;
 	}
+
+	/**
+ 	* null-safe collection reference
+ 	*/
+	public static <T> Collection<T> safe(Collection<T> collection) {
+		return collection != null ? collection : Collections.<T>emptyList();
+	}
+
+	public static <T> List<T> safe(List<T> list) {
+		return list != null ? list : Collections.<T>emptyList();
+	}
+
+	public static <T> List<T> safe(T[] list) {
+		return list != null ? Arrays.asList(list) : Collections.<T>emptyList();
+	}
 }
