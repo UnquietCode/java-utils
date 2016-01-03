@@ -23,6 +23,7 @@ public class ConditionalsTest {
 		assertTrue(Conditionals.any(null, true));
 		assertFalse(Conditionals.any(false));
 		assertFalse(Conditionals.any(false, null));
-		assertFalse(Conditionals.any(null));
+
+		assertFalse(Conditionals.any((Boolean[]) null));
 	}
 }

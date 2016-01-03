@@ -1,7 +1,8 @@
 package unquietcode.utils;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author Ben Fagin
@@ -9,6 +10,18 @@ import java.util.GregorianCalendar;
 public final class TimeUtils {
 	private TimeUtils() { }
 
+	private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+	private static final DateFormat ISO_8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'"); static {
+		ISO_8601.setTimeZone(UTC);
+	}
+
+	public static String iso8601(long time) {
+		return iso8601(new Date(time));
+	}
+
+	public static String iso8601(Date date) {
+		return ISO_8601.format(Objects.requireNonNull(date));
+	}
 
 	public static long getCurrentTimeToTheMinute() {
 		Calendar time = GregorianCalendar.getInstance();

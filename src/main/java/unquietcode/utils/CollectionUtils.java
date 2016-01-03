@@ -1,13 +1,55 @@
 package unquietcode.utils;
 
+import java.lang.reflect.Array;
 import java.util.*;
+import java.util.function.Supplier;
 
 public final class CollectionUtils {
 	private CollectionUtils() { }
 
 
+	@SafeVarargs
+	public static <T> T[] array(T...values) {
+		return values;
+	}
+
+	@SafeVarargs
+	public static <T> T[] prepend(T[] array, T...newValues) {
+		return append(newValues, array);
+	}
+
+	@SafeVarargs
+	public static <T> T[] append(T[] array, T...newValues) {
+		T[] newArray = (T[]) Array.newInstance(array.getClass().getComponentType(), array.length+newValues.length);
+		System.arraycopy(array, 0, newArray, 0, array.length);
+		System.arraycopy(newValues, 0, newArray, array.length, newValues.length);
+
+		return newArray;
+	}
+
+	@SafeVarargs
+	public static <T> List<T> list(T...values) {
+		return Arrays.asList(values);
+	}
+
+	@SafeVarargs
+	public static <T> Set<T> hashSet(T...values) {
+		return new HashSet<>(list(values));
+	}
+
 	public static String print(Collection<?> values) {
 		return print("[", "]", ", ", values);
+	}
+
+	public static String print(Map<?, ?> values) {
+		Set<String> set = new HashSet<>();
+
+		for (Map.Entry<?, ?> entry : values.entrySet()) {
+			String string = String.valueOf(entry.getKey()) + " => " + String.valueOf(entry.getValue());
+			set.add(string);
+		}
+
+		return print(set);
 	}
 
 	public static String print(Object...values) {
@@ -31,6 +73,7 @@ public final class CollectionUtils {
 		sb.append(prefix);
 
 		boolean first = true;
+
 		for (Object value : values) {
 			if (first) {
 				first = false;
@@ -55,9 +98,40 @@ public final class CollectionUtils {
 		return target;
 	}
 
+	public static <K, V> V synchronized_get_or_set(Map<K, V> map, K key, Supplier<V> valueProvider) {
+
+		// check once
+		if (map.containsKey(key)) {
+			return map.get(key);
+		}
+
+		// lock
+		synchronized (map) {
+
+			// check again
+			if (map.containsKey(key)) {
+				return map.get(key);
+			}
+
+			// store new value, and return it
+			V value = valueProvider.get();
+			map.put(key, value);
+			return value;
+		}
+	}
+
+	public static <T> T first(List<T> list) {
+		return list.get(0);
+	}
+
+	public static <T> T last(List<T> list) {
+		return list.get(list.size()-1);
+	}
+
+
 	/**
- 	* null-safe collection reference
- 	*/
+ 	 * null-safe collection reference
+ 	 */
 	public static <T> Collection<T> safe(Collection<T> collection) {
 		return collection != null ? collection : Collections.<T>emptyList();
 	}
@@ -68,5 +142,82 @@ public final class CollectionUtils {
 
 	public static <T> List<T> safe(T[] list) {
 		return list != null ? Arrays.asList(list) : Collections.<T>emptyList();
+	}
+
+
+	// empty / not empty
+
+	public static <T> boolean isEmpty(Collection<T> collection) {
+		return collection == null  ||  collection.isEmpty();
+	}
+
+	public static <T> boolean isNotEmpty(Collection<T> collection) {
+		return !isEmpty(collection);
+	}
+
+	public static <T> boolean isEmpty(T[] array) {
+		return array == null  ||  array.length == 0;
+	}
+
+	public static <T> boolean isNotEmpty(T[] array)	{
+		return !isEmpty(array);
+	}
+
+
+	// collection modifiers
+
+	public static <K, V> void addToArrayList(Map<K, List<V>> map, K key, V value) {
+		addToMap(map, key, value, new Factory<List<V>>() {
+			public List<V> get() {
+				return new ArrayList<V>();
+			}
+		});
+	}
+
+	public static <K, V> void addToHashSet(Map<K, Set<V>> map, K key, V value) {
+		addToMap(map, key, value, new Factory<Set<V>>() {
+			public Set<V> get() {
+				return new HashSet<V>();
+			}
+		});
+	}
+
+	public static <K, V, T extends Collection<V>> void addToMap(Map<K, T> map, K key, V value, Factory<T> factory) {
+		if (map.containsKey(key)) {
+			map.get(key).add(value);
+		} else {
+			T collection = factory.get();
+			collection.add(value);
+			map.put(key, collection);
+		}
+	}
+
+	public static <_Key1, _Key2, _Value> void addToHashMap(
+		Map<_Key1, Map<_Key2, _Value>> map,
+		_Key1 outerKey, _Key2 innerKey, _Value value
+	){
+		addToNestedMap(map, outerKey, innerKey, value, new Factory<Map<_Key2, _Value>>() {
+			public Map<_Key2, _Value> get() {
+				return new HashMap<_Key2, _Value>();
+			}
+		});
+	}
+
+	public static <_Key1, _Key2, _Value> void addToNestedMap(
+		Map<_Key1, Map<_Key2, _Value>> map,
+		_Key1 outerKey, _Key2 innerKey, _Value value, Factory<Map<_Key2, _Value>> factory
+	){
+		Map<_Key2, _Value> innerMap = map.get(outerKey);
+
+		if (innerMap == null) {
+			innerMap = factory.get();
+			map.put(outerKey, innerMap);
+		}
+
+		innerMap.put(innerKey, value);
+	}
+
+	public static <T> Set<T> newIdentityHashSet() {
+		return Collections.newSetFromMap(new IdentityHashMap<T, Boolean>());
 	}
 }

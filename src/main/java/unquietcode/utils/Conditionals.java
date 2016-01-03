@@ -33,6 +33,7 @@ public class Conditionals {
 		return true;
 	}
 
+	@SafeVarargs
 	public static <T> boolean equalsAll(T value, T...tests) {
 		if (value == null) {
 			for (T test : tests) {
@@ -51,6 +52,7 @@ public class Conditionals {
 		return true;
 	}
 
+	@SafeVarargs
 	public static <T> boolean equalsAny(T value, T...tests) {
 		if (value == null) {
 			for (T test : tests) {
@@ -69,6 +71,7 @@ public class Conditionals {
 		return false;
 	}
 
+	@SafeVarargs
 	public static <T> boolean equalsNone(T value, T...tests) {
 		return !equalsAny(value, tests);
 	}

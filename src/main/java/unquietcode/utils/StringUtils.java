@@ -108,6 +108,17 @@ public class StringUtils {
 
 	// misc.
 
+	public static String requireNonEmpty(String string) {
+		return requireNonEmpty(string, "a valid string is required");
+	}
+
+	public static String requireNonEmpty(String string, String message) {
+		if (isEmpty(string)) {
+			throw new IllegalArgumentException(message);
+		}
+		return string;
+	}
+
 	public static String reverse(String string) {
 		StringBuilder sb = new StringBuilder(string);
 		sb = sb.reverse();

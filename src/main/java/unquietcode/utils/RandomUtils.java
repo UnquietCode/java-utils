@@ -100,7 +100,7 @@ public final class RandomUtils {
 		return sb.toString();
 	}
 
-	// generates a new random string comprised of base64 characters
+	// generates a new random string comprised of ultra-safe lowercase letters only
 	public static String getRandomSafeKey(int length) {
 		StringBuilder sb = new StringBuilder();
 
