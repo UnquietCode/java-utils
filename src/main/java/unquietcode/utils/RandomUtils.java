@@ -29,6 +29,13 @@ public final class RandomUtils {
 
 	//---o---o---o---o---o---o---o---o---o---o---o---o---o---o---o---o---o---o---o---o---o---o---//
 
+	public static int randomInt(int max) {
+		if (max < 0) {
+			throw new IllegalArgumentException("non-negative only");
+		}
+		return randomSource.nextInt(max);
+	}
+
 	public static <T> Iterator<T> weightedRandomSelection(Map<T, Double> mapping) {
 
 		// create a list of entries
