@@ -5,6 +5,7 @@ package unquietcode.utils;
  *
  * @author Ben Fagin
  */
+@FunctionalInterface
 public interface Factory<T> {
 	T get();
 }
