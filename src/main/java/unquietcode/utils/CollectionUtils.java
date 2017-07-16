@@ -3,6 +3,7 @@ package unquietcode.utils;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public final class CollectionUtils {
 	private CollectionUtils() { }
@@ -29,7 +30,7 @@ public final class CollectionUtils {
 
 	@SafeVarargs
 	public static <T> List<T> list(T...values) {
-		return Arrays.asList(values);
+		return new ArrayList<>(Arrays.asList(values));
 	}
 
 	@SafeVarargs
@@ -167,19 +168,15 @@ public final class CollectionUtils {
 	// collection modifiers
 
 	public static <K, V> void addToArrayList(Map<K, List<V>> map, K key, V value) {
-		addToMap(map, key, value, new Factory<List<V>>() {
-			public List<V> get() {
-				return new ArrayList<V>();
-			}
-		});
+		addToMap(map, key, value, ArrayList::new);
 	}
 
 	public static <K, V> void addToHashSet(Map<K, Set<V>> map, K key, V value) {
-		addToMap(map, key, value, new Factory<Set<V>>() {
-			public Set<V> get() {
-				return new HashSet<V>();
-			}
-		});
+		addToMap(map, key, value, HashSet::new);
+	}
+
+	public static <K, V> void addToIdentityHashSet(Map<K, Set<V>> map, K key, V value) {
+		addToMap(map, key, value, CollectionUtils::newIdentityHashSet);
 	}
 
 	public static <K, V, T extends Collection<V>> void addToMap(Map<K, T> map, K key, V value, Factory<T> factory) {
@@ -196,11 +193,14 @@ public final class CollectionUtils {
 		Map<_Key1, Map<_Key2, _Value>> map,
 		_Key1 outerKey, _Key2 innerKey, _Value value
 	){
-		addToNestedMap(map, outerKey, innerKey, value, new Factory<Map<_Key2, _Value>>() {
-			public Map<_Key2, _Value> get() {
-				return new HashMap<_Key2, _Value>();
-			}
-		});
+		addToNestedMap(map, outerKey, innerKey, value, HashMap::new);
+	}
+
+	public static <_Key1, _Key2, _Value> void addToIdentityHashMap(
+		Map<_Key1, Map<_Key2, _Value>> map,
+		_Key1 outerKey, _Key2 innerKey, _Value value
+	){
+		addToNestedMap(map, outerKey, innerKey, value, IdentityHashMap::new);
 	}
 
 	public static <_Key1, _Key2, _Value> void addToNestedMap(
@@ -219,5 +219,12 @@ public final class CollectionUtils {
 
 	public static <T> Set<T> newIdentityHashSet() {
 		return Collections.newSetFromMap(new IdentityHashMap<T, Boolean>());
+	}
+
+	public static <T> List<T> flatten(Collection<? extends Collection<T>> items) {
+		return items.stream()
+			.flatMap(Collection::stream)
+			.collect(Collectors.toList())
+		;
 	}
 }
