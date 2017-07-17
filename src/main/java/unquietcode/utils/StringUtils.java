@@ -1,6 +1,9 @@
 package unquietcode.utils;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * @author Ben Fagin
@@ -173,5 +176,50 @@ public class StringUtils {
 				break;
 			}
 		}
+	}
+
+	public static String join(String...strings) {
+		return join(null, strings);
+	}
+
+	public static String join(Collection<String> strings) {
+		return join(null, strings);
+	}
+
+	public static String join(String delineator, String...strings) {
+		return join(delineator, Arrays.asList(strings));
+	}
+
+	public static String join(String delineator, Collection<String> strings) {
+		return join(delineator, strings, null);
+	}
+
+	public static String join(String delineator, Collection<String> strings, Function<String, String> fn) {
+
+		// default delineator
+		if (delineator == null) {
+			delineator = " ";
+		}
+
+		// default function
+		if (fn == null) {
+			fn = Function.identity();
+		}
+
+		StringBuilder string = new StringBuilder();
+		boolean first = true;
+
+		for (String s : strings) {
+			if (first) {
+				first = false;
+			} else {
+				string.append(delineator);
+			}
+
+			s = fn.apply(s);
+			string.append(s);
+		}
+
+		return string.toString();
 	}
 }
