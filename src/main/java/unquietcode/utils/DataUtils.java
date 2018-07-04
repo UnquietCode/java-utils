@@ -1,9 +1,7 @@
 package unquietcode.utils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+
 
 public final class DataUtils {
 	private DataUtils() { }
@@ -43,5 +41,14 @@ public final class DataUtils {
 		while ((read = is.read(bytes)) != -1) {
 			os.write(bytes, 0, read);
 		}
+	}
+
+	public static InputStream readFile(String path) throws FileNotFoundException {
+		return new FileInputStream(path);
+	}
+
+	public static String readFileToString(String path) throws IOException, FileNotFoundException {
+		InputStream stream = readFile(path);
+		return readStreamToString(stream);
 	}
 }

@@ -28,6 +28,21 @@ public final class CollectionUtils {
 		return newArray;
 	}
 
+	public static <T> List<T> deduplicate(T[] array, Factory<Set<T>> setFactory) {
+		Set<T> set = setFactory.get();
+		List<T> retval = new ArrayList<>();
+
+		for (T t : array) {
+			if (!set.contains(t)) {
+				set.add(t);
+				retval.add(t);
+			}
+		}
+
+		return retval;
+
+	}
+
 	@SafeVarargs
 	public static <T> List<T> list(T...values) {
 		return new ArrayList<>(Arrays.asList(values));
