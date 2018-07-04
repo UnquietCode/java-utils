@@ -1,4 +1,6 @@
 apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 sourceCompatibility = 1.8
 version = '0.1'
@@ -14,4 +16,70 @@ dependencies {
 
 task wrapper(type: Wrapper) {
 	gradleVersion = '4.8'
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = 'javadoc'
+	from javadoc.destinationDir
+}
+
+artifacts {
+	archives sourcesJar
+	archives javadocJar
+}
+
+uploadArchives {
+	repositories {
+		mavenDeployer {
+			beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+				authentication(userName: hasProperty('ossrhUsername') ? ossrhUsername : '', password: hasProperty('ossrhPassword') ? ossrhPassword : '')
+			}
+
+			snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+				authentication(userName: hasProperty('ossrhUsername') ? ossrhUsername : '', password: hasProperty('ossrhPassword') ? ossrhPassword : '')
+			}
+
+			pom.project {
+				name 'Java Utilities'
+				packaging 'jar'
+				description 'a collection of simple utility methods for Java'
+				url 'https://github.com/UnquietCode/java-utils.git'
+
+				scm {
+					connection 'scm:git:https://github.com/UnquietCode/java-utils.git'
+					developerConnection 'scm:git:https://github.com/UnquietCode/java-utils.git'
+					url 'https://github.com/UnquietCode/java-utils'
+				}
+
+				licenses {
+					license {
+						name 'MIT License'
+						url 'https://mit-license.org'
+					}
+				}
+
+				developers {
+					developer {
+						id 'unquietcode'
+						name 'Benjamin Fagin'
+						email 'blouis@unquietcode.com'
+					}
+				}
+			}
+		}
+	}
+}
+
+// code signing
+if (System.getProperty("do.sign") != null) {
+	signing {
+		sign configurations.archives
+	}
 }
